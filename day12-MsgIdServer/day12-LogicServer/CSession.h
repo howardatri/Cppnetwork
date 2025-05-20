@@ -35,9 +35,17 @@ private:
 	std::queue<shared_ptr<MsgNode> > _send_que;
 	std::mutex _send_lock;
 	//接收消息的节点
-	std::shared_ptr<MsgNode> _recv_msg_node;
+	std::shared_ptr<RecvNode> _recv_msg_node;
 	bool _b_head_parse;
 	//接收消息的头部
-	std::shared_ptr<MsgNode> _recv_head_node;
+	std::shared_ptr<RecvNode> _recv_head_node;
 };
 
+class LogicNode {
+	friend class LogicSystem;
+public:
+	LogicNode(shared_ptr<CSession>, shared_ptr<RecvNode>);
+private:
+	shared_ptr<CSession> _session;
+	shared_ptr<RecvNode> _recvnode;
+};

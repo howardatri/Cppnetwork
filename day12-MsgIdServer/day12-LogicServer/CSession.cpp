@@ -5,6 +5,7 @@
 #include <json/json.h>
 #include <json/value.h>
 #include <json/reader.h>
+#include"LogicSystem.h"
 
 CSession::CSession(boost::asio::io_context& io_context, CServer* server):
 	_socket(io_context), _server(server), _b_close(false),_b_head_parse(false){
@@ -164,16 +165,17 @@ void CSession::HandleRead(const boost::system::error_code& error, size_t  bytes_
 					copy_len += msg_len;
 					bytes_transferred -= msg_len;
 					_recv_msg_node->_data[_recv_msg_node->_total_len] = '\0';
+					LogicSystem::GetInstance()->PostMsgToQue(make_shared<LogicNode>(shared_from_this(), _recv_msg_node));
 					//cout << "receive data is " << _recv_msg_node->_data << endl;
 					//send
-					Json::Reader reader;
-					Json::Value root;
-					reader.parse(std::string(_recv_msg_node->_data, _recv_msg_node->_total_len), root);
-					std::cout << "recevie msg id  is " << root["id"].asInt() << " msg data is "
-						<< root["data"].asString() << endl;
-					root["data"] = "server has received msg, msg data is " + root["data"].asString();
-					std::string return_str = root.toStyledString();
-					Send(return_str, root["id"].asInt());
+					//Json::Reader reader;
+					//Json::Value root;
+					//reader.parse(std::string(_recv_msg_node->_data, _recv_msg_node->_total_len), root);
+					//std::cout << "recevie msg id  is " << root["id"].asInt() << " msg data is "
+					//	<< root["data"].asString() << endl;
+					//root["data"] = "server has received msg, msg data is " + root["data"].asString();
+					//std::string return_str = root.toStyledString();
+					//Send(return_str, root["id"].asInt());
 					//继续轮询接收
 					_b_head_parse = false;
 					_recv_head_node->Clear();
@@ -202,17 +204,18 @@ void CSession::HandleRead(const boost::system::error_code& error, size_t  bytes_
 				bytes_transferred -= remain_msg;
 				copy_len += remain_msg;
 				_recv_msg_node->_data[_recv_msg_node->_total_len] = '\0';
+				LogicSystem::GetInstance()->PostMsgToQue(make_shared<LogicNode>(shared_from_this(), _recv_msg_node));
 				//cout << "receive data is " << _recv_msg_node->_data << endl;
 					//
-				Json::Reader reader;
-				Json::Value root;
-				reader.parse(std::string(_recv_msg_node->_data, _recv_msg_node->_total_len), root);
-				std::cout << "recevie msg id  is " << root["id"].asInt() << " msg data is "
-					<< root["data"].asString() << endl;
-				root["data"] = "server has received msg, msg data is " + root["data"].asString();
-				std::string return_str = root.toStyledString();
-				Send(return_str, root["id"].asInt());
-				//
+				//Json::Reader reader;
+				//Json::Value root;
+				//reader.parse(std::string(_recv_msg_node->_data, _recv_msg_node->_total_len), root);
+				//std::cout << "recevie msg id  is " << root["id"].asInt() << " msg data is "
+				//	<< root["data"].asString() << endl;
+				//root["data"] = "server has received msg, msg data is " + root["data"].asString();
+				//std::string return_str = root.toStyledString();
+				//Send(return_str, root["id"].asInt());
+				//继续轮询未处理数据
 				_b_head_parse = false;
 				_recv_head_node->Clear();
 				if (bytes_transferred <= 0) {
@@ -233,4 +236,10 @@ void CSession::HandleRead(const boost::system::error_code& error, size_t  bytes_
 	catch (std::exception& e) {
 		std::cout << "Exception code is " << e.what() << endl;
 	}
+}
+
+
+LogicNode::LogicNode(shared_ptr<CSession> session,shared_ptr<RecvNode> recvnode) :_session(session),
+_recvnode(recvnode) {
+
 }

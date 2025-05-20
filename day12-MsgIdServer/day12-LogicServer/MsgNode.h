@@ -5,6 +5,7 @@
 #include <boost/asio.hpp>
 using namespace std;
 using boost::asio::ip::tcp;
+class LogicSystem;
 class MsgNode
 {
 public:
@@ -28,6 +29,7 @@ public:
 };
 
 class RecvNode :public MsgNode {
+	friend class LogicSystem;
 public:
 	RecvNode(short max_len, short msg_id);
 private:
@@ -35,6 +37,7 @@ private:
 };
 
 class SendNode : public MsgNode{
+	friend class LogicSystem;
 public:
 	SendNode(const char* msg, short max_len, short msg_id);
 private:
