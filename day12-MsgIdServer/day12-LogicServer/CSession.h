@@ -38,7 +38,7 @@ private:
 	std::shared_ptr<RecvNode> _recv_msg_node;
 	bool _b_head_parse;
 	//接收消息的头部
-	std::shared_ptr<RecvNode> _recv_head_node;
+	std::shared_ptr<MsgNode> _recv_head_node;
 };
 
 class LogicNode {
